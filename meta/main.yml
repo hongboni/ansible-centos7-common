@@ -3,10 +3,10 @@ dependencies: []
 
 galaxy_info:
 
-  author: 'nihongo'
-  description: 'Common server convenience and security settings'
-  license: '2-clause BSD'
-  min_ansible_version: '2.2'
+  author: 'centos'
+  description: 'Common server security settings for RHEL/Centos 7'
+  license: 'BSD'
+  min_ansible_version: '2.1'
 
   platforms:
     - name: EL
