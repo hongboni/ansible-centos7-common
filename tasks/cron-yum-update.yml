@@ -1,0 +1,7 @@
+---
+- name: Config Cron job for 'yum update -y -security'
+  lineinfile:
+    dest: /etc/crontab 
+    state: present
+    line: '10 03 * * * root /usr/bin/yum update -y --security >>/var/log/yum-update.log 2>&1'
+

@@ -1,10 +1,10 @@
 ---
 
 # Install EPEL and  basic packages
-- name: Install EPEL repo
-  package:
-    name: epel-release
-    state: latest
+#- name: Install EPEL repo
+#  package:
+#    name: epel-release
+#    state: latest
 
 #- name: Upgrade packages to latest
 #  package:

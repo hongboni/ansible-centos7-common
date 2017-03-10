@@ -26,7 +26,6 @@ common_base_packages:
   - nano
   - screen
   - vim
-  - htop
   - iotop
   - unzip
   - wget

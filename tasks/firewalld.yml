@@ -1,0 +1,13 @@
+---
+# Install Firewall
+
+- name: Install firewalld
+  package:
+    name: firewalld
+    state: present
+
+- name: Start Firewalld
+  service:
+    name: firewalld
+    state: started
+
