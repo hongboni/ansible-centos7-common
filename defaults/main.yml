@@ -1,0 +1,72 @@
+---
+common_timezone: 'Australia/Sydney'
+
+# ssh customizations
+# Includes recommended security settings and custom port simpy to evade
+# port 22 is still open for ansible controller 
+common_ssh_port: 22022
+common_ssh_password_authentication: 'no'
+common_ssh_permit_root_login: 'no'
+
+common_sudo_users:
+  - username: centos
+    sshkeys:
+      - 'ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAh9oC9N0BFjwStB+G4p2eYqk4FpmHBXRDm7lGoBDZCEXVFcTsstOS+SWjHEustkIe2NaW6wfWsWCm6rUrPCpSGpZ67VkqMydjPbdc3LVHCVVLYtZcB1Iy9oZsB12QoE8Aid9eTraIz1NfrvpLa1Z0m5N7x0GaFt0i2X3yGOIoT4tAeE6RdggVwf+HeAfsYc7KSfXXwdlgnFuGsqfJWt3zgr+IJl7N3EWKFIrt+AqcVhMaqex1mjzmuXhptSipalxD5wpFIpofB7+Gm5HnNC20Q3vCG+JBzMsVQ5amfGOSlYVs+OftO1F1wcahX2nqgwA0QGB2MBpJiIl9hG5GdRx19Q== rsa-key-Ansible-2017'
+      - 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCqkGAcrWZbeiUHZHNMHHV1gGUVtBRcdD5Z/1iOnRzlaAQ+dBDYSgzpO6kc5l8dAffBE3Eg+IS5jGPM16Jx38jKHLV020gFw7Sg0cI/I+nBlTTj+r1b7MRS7ObZSmFXJH/Zl5iioyLT5c0cqvRutO4bilmmWqwwUVLx5kQYdXMsrg7sVo3R+jqFKU6FVfJYmnDB0MqW+qdxDHxj54JC0LlJJpuMgT+19/b6vrKZocvfKhv0VSR04q4NUidufpyo+UyQWOKfwQ0612hBsqFw5pRZ5PHyrE18yUtuJDrXFiP0aZAja6zvYtcy3wvVoTzR4UFbQEq+VWdodLjbFLzIL3Ft root@ansible.host'
+
+common_selinux_mode: 'enforcing'  # enforcing/permissive/disabled
+common_selinux_type: 'targeted'   # targeted/minimum/mls
+
+# A small VPS can use some swap to avoid processes being killed too easily
+common_swapfile_size: 1024 # Swapfile size in MB, 0 to disable
+common_swapfile_location: /swapfile
+
+# Default packages you want installed on every server
+common_base_packages:
+  - nano
+  - screen
+  - vim
+  - htop
+  - iotop
+  - unzip
+  - wget
+  - mlocate           # for; 'locate' command
+  - bash-completion   # for; tab-completion
+  - yum-utils         # for; needs-restarting, repoquery
+  - bind-utils        # for; dig, nslookup
+  - rsync             # must be installed on both ends 
+
+# Required packages for selinux enforcement and management
+common_selinux_packages:
+  - selinux-policy
+  - selinux-policy-targeted
+  - libselinux-python
+  - policycoreutils-python
+  - audit
+
+common_shell_customizations:
+  - path: /etc/profile.d/colorls.sh
+    regexp: "^alias ll="
+    line: "alias ll='ls -la --color=auto' 2>/dev/null"
+
+    # Interactive rm is the devil's work
+  - path: /root/.bashrc
+    regexp: "alias rm="
+    line: "alias rm='rm'"
+
+    # Vim settings I prefer to have global
+  - path: /etc/vimrc
+    regexp: "set smartindent"
+    line: "set smartindent"
+  - path: /etc/vimrc
+    regexp: "set tabstop=4"
+    line: "set tabstop=4"
+  - path: /etc/vimrc
+    regexp: "set shiftwidth=4"
+    line: "set shiftwidth=4"
+  - path: /etc/vimrc
+    regexp: "set expandtab"
+    line: "set expandtab"
+  - path: /etc/vimrc
+    regexp: "set number"
+    line: "set number"

@@ -1,0 +1,4 @@
+# use {{ ipify_public_ip }} to reference my public ip
+- name: get my public IP
+  ipify_facts: api_url=http://api.ipify.org
+  connection: local

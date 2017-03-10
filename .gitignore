@@ -1,0 +1,9 @@
+# Ansible specific excludes
+
+*.pub
+*.retry
+group_vars
+!group_vars/all.yml
+
+required-roles/
+secret/

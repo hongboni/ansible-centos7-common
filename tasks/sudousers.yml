@@ -1,0 +1,22 @@
+---
+- name: Make sure we have a 'wheel' group
+  group:
+    name: wheel
+    state: present
+
+- name: Allow 'wheel' group to have passwordless sudo
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%wheel'
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+
+- name: Add sudoers to wheel group
+  user: name="{{ item.username }}" groups=wheel append=yes state=present createhome=yes
+  with_items: "{{ common_sudo_users }}"
+
+- name: Set up authorized keys for the sudo users
+  authorized_key: user="{{ item.0.username }}" key="{{ item.1 }}"
+  with_subelements:
+    - "{{ common_sudo_users }}"
+    - sshkeys

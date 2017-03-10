@@ -1,0 +1,87 @@
+---
+# After these tasks complete sshd may be running on a different port, denying root login,
+# or only accepting pubkeys. If you can't run any further Ansible commands perhaps
+# your hosts file or cli command hasn't accounted for the above issues
+
+- name: Harden sshd configuration - set PasswdLogin to {{ common_ssh_password_authentication }}
+  lineinfile:
+    dest: '/etc/ssh/sshd_config'
+    regexp: "^#?PasswordAuthentication"
+    line: "PasswordAuthentication {{ common_ssh_password_authentication }}"
+    state: present
+    backrefs: yes
+  notify:
+    - reload sshd
+
+- name: Harden sshd configuration - set RootLogin to {{ common_ssh_permit_root_login }}
+  lineinfile:
+    dest: '/etc/ssh/sshd_config'
+    regexp: "^#?PermitRootLogin"
+    line: "PermitRootLogin {{ common_ssh_permit_root_login }}"
+    state: present
+    backrefs: yes
+  notify:
+    - reload sshd
+
+
+# A custom SSH port requires multiple changes, including configuring SELinux
+# and firewalld to accept the new port
+- name: "Configure sshd on default port 22 - limit ip via firewall"
+  lineinfile:
+    dest: '/etc/ssh/sshd_config'
+    insertafter: "^#Port"
+    line: "Port 22"
+  register: port22_cmd
+
+- name: "Configure ssh for port {{ common_ssh_port }}"
+  lineinfile:
+    dest: '/etc/ssh/sshd_config'
+    insertafter: "^Port 22$"
+    line: "Port {{ common_ssh_port }}"
+  register: port_command
+  notify:
+    - reload sshd
+
+# Idempotent SELinux ssh port modifications
+- name: "Validate SELinux configuraiton of ssh port {{ common_ssh_port }}"
+  shell: semanage port -l | egrep "^ssh_port_t" | egrep "\b{{ common_ssh_port }}\b"
+  register: selinux_command
+  changed_when: selinux_command.stdout.find("{{ common_ssh_port }}") == -1
+  failed_when: False
+  when: common_selinux_mode != 'disabled' and port_command.changed
+
+- name: "Configure SELinux for ssh port {{ common_ssh_port }}"
+  command: semanage port -a -t ssh_port_t -p tcp {{ common_ssh_port }}
+  when: selinux_command.changed
+
+# Idempotent Firewall ssh port modifications - keep 22 private, add new port for public
+- name: "Firewall - Enable ssh port {{ common_ssh_port }}"
+  firewalld: port={{ common_ssh_port }}/tcp permanent=true state=enabled immediate=yes
+
+- name: "Firewall - Disable default SSH port 22 for all"
+  firewalld: port=22/tcp permanent=true state=disabled immediate=yes
+
+- name: "Firewall - Disable default SSH service 'ssh' for all"
+  firewalld: service=ssh permanent=true state=disabled immediate=yes
+
+- name: Firewall - Allow My Public IP {{ ipify_public_ip }} to connect on port 22 
+  firewalld: 
+    rich_rule: 'rule family="ipv4" source address="{{ ipify_public_ip }}" port protocol="tcp" port="22" accept'
+    permanent: true
+    state: enabled
+    immediate: yes
+
+- name: Firewall - Allow Private IP 192.168.0.0/16 to connect on port 22 
+  firewalld: 
+    rich_rule: 'rule family="ipv4" source address="192.168.0.0/16" port protocol="tcp" port="22" accept'
+    permanent: true
+    state: enabled
+    immediate: yes
+
+- name: Firewall - Allow Private IP 10.0.0.0/8 to connect on port 22 
+  firewalld: 
+    rich_rule: 'rule family="ipv4" source address="10.0.0.0/8" port protocol="tcp" port="22" accept'
+    permanent: true
+    state: enabled
+    immediate: yes
+

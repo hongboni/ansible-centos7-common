@@ -1,0 +1,33 @@
+---
+- name: Install yum-cron
+  package: name=yum-cron state=present
+
+- name: Config yum-cron to update on Security
+  lineinfile:
+    dest: /etc/yum/yum-cron.conf
+    state: present
+    backrefs: yes
+    regexp: '^update_cmd'
+    line: 'update_cmd = security'
+  notify:
+    - restart yum-cron
+
+- name: Config yum-cron to Apply Updates
+  lineinfile:
+    dest: /etc/yum/yum-cron.conf
+    state: present
+    backrefs: yes
+    regexp: '^apply_updates'
+    line: 'apply_updates = yes'
+  notify:
+    - restart yum-cron
+
+- name: Config yum-cron to log to yum-cron.log
+  lineinfile:
+    dest: /etc/yum/yum-cron.conf
+    state: present
+    line: 'logfile=/var/log/yum-cron.log'
+  notify:
+    - restart yum-cron
+
+
