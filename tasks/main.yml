@@ -32,3 +32,6 @@
 
 - include: hostname.yml
   tags: ['common', 'common-hostname']
+
+- include: chrony.yml
+  tags: ['common', 'common-chrony']

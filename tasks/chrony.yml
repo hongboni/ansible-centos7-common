@@ -1,0 +1,13 @@
+---
+# Install Chrony for time syncronization
+
+- name: Install Chrony for time syncronization
+  package:
+    name: chrony
+    state: present
+
+- name: Start Chrony Service
+  service:
+    name: chronyd
+    state: started
+
