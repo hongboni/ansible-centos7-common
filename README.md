@@ -9,7 +9,7 @@ Common setup tasks for all RedHat/CentOS 7 servers
   * Disable password authentication
   * Add Sudo users with ssh keys login
   * Add non-default port for sshd (also set SELinux & firewalld config)
-  * Limit default port 22 only for Ansible controler host and Privarte IPs
+  * Limit default port 22 only for Ansible controler host and Private IPs
 * Update all existing packages
 * Install user-defined base packages (ex: nano ntp)
 * Enable automatic yum updates of security patches (via yum-cron)
